@@ -1,0 +1,21 @@
+D:\C# projects\Diplom\Diplom\bin\Debug\Diplom.exe.config
+D:\C# projects\Diplom\Diplom\bin\Debug\Diplom.exe
+D:\C# projects\Diplom\Diplom\bin\Debug\Diplom.pdb
+D:\C# projects\Diplom\Diplom\obj\Debug\Diplom.csproj.AssemblyReference.cache
+D:\C# projects\Diplom\Diplom\obj\Debug\Diplom.Form1.resources
+D:\C# projects\Diplom\Diplom\obj\Debug\Diplom.Properties.Resources.resources
+D:\C# projects\Diplom\Diplom\obj\Debug\Diplom.csproj.GenerateResource.cache
+D:\C# projects\Diplom\Diplom\obj\Debug\Diplom.csproj.CoreCompileInputs.cache
+D:\C# projects\Diplom\Diplom\obj\Debug\Diplom.exe
+D:\C# projects\Diplom\Diplom\obj\Debug\Diplom.pdb
+C:\Users\Пользователь\Desktop\Diplom\Diplom\bin\Debug\base.mdb
+C:\Users\Пользователь\Desktop\Diplom\Diplom\bin\Debug\Diplom.exe.config
+C:\Users\Пользователь\Desktop\Diplom\Diplom\bin\Debug\Diplom.exe
+C:\Users\Пользователь\Desktop\Diplom\Diplom\bin\Debug\Diplom.pdb
+C:\Users\Пользователь\Desktop\Diplom\Diplom\obj\Debug\Diplom.csproj.AssemblyReference.cache
+C:\Users\Пользователь\Desktop\Diplom\Diplom\obj\Debug\Diplom.Form1.resources
+C:\Users\Пользователь\Desktop\Diplom\Diplom\obj\Debug\Diplom.Properties.Resources.resources
+C:\Users\Пользователь\Desktop\Diplom\Diplom\obj\Debug\Diplom.csproj.GenerateResource.cache
+C:\Users\Пользователь\Desktop\Diplom\Diplom\obj\Debug\Diplom.csproj.CoreCompileInputs.cache
+C:\Users\Пользователь\Desktop\Diplom\Diplom\obj\Debug\Diplom.exe
+C:\Users\Пользователь\Desktop\Diplom\Diplom\obj\Debug\Diplom.pdb
