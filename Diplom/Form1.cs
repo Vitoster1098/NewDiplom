@@ -444,9 +444,7 @@ namespace Diplom
             }
 
             reader.Read();
-
             analyse = new pixelAnalyse(progressBar1); //Очистка и после установка всего нового
-
             analyse.setAvgBrightness(Convert.ToDouble(reader["AllBright"].ToString()));
 
             string[] tempImg = (reader["Img"]).ToString().Split(':');
