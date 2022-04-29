@@ -4,6 +4,8 @@ using System.Windows.Forms;
 using System.Data.OleDb;
 using System.IO;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Diplom
 {
@@ -59,12 +61,19 @@ namespace Diplom
             chart1.Series[0].Points.Clear();
             chart2.Series[0].Points.Clear();
             chart3.Series[0].Points.Clear();
+            chart4.Series[0].Points.Clear();
+            comboBox1.Items.Clear();
 
-            //pictureBox2.Image.Dispose();
             pictureBox2.Image = null;
             progressBar1.Value = 0;
             avgLabel.Text = "Средняя яркость:";
-            comboBox1.Items.Clear();
+            DeflRLabel.Text = "Ср.кв.откл R:";
+            DeflGLabel.Text = "Ср.кв.откл G:";
+            DeflBLabel.Text = "Ср.кв.откл B:";
+
+            MedRLabel.Text = "Медиана R:";
+            MedGLabel.Text = "Медиана G:";
+            MedBLabel.Text = "Медиана B:";            
         }
 
         public void ScanFile(string path, string diagnose)
@@ -329,12 +338,17 @@ namespace Diplom
             selBitmap = new Bitmap(analyse.getBitmapByInfo(new Bitmap(selBitmap.Width, selBitmap.Height))); //получение битмапа на основе данных из бд
             pictureBox2.Image = selBitmap;
 
-            analyse.wR = analyse.getAvgFrequency("R");
+            ReDisplayInfo();
+        }
+
+        private void ReDisplayInfo()
+        {
+            analyse.wR = analyse.getAvgFrequency("R"); //Заполнение массивов частот
             analyse.wG = analyse.getAvgFrequency("G");
             analyse.wB = analyse.getAvgFrequency("B");
 
-            analyse.calcMed();
-            analyse.calcDefl();
+            analyse.calcMed(); //Подсчет медианы
+            analyse.calcDefl(); //Подсчет среднеквадратического отклонения
 
             DeflRLabel.Text = "Ср.кв.откл R:" + Math.Round(analyse.getSg()[0], 3);
             DeflGLabel.Text = "Ср.кв.откл G:" + Math.Round(analyse.getSg()[1], 3);
@@ -344,12 +358,13 @@ namespace Diplom
             MedGLabel.Text = "Медиана G:" + Math.Round(analyse.getMed()[1], 3);
             MedBLabel.Text = "Медиана B:" + Math.Round(analyse.getMed()[2], 3);
 
-            analyse.setRGB(chart1, chart2, chart3, chart4);
             avgBrightness = analyse.getAvgBrightness();
             avgLabel.Text = "Средняя яркость: " + Math.Round(avgBrightness, 3);
             avR.Text = "Среднее R: " + Math.Round(analyse.getAverageGistogramm("R"), 3);
             avG.Text = "Среднее G: " + Math.Round(analyse.getAverageGistogramm("G"), 3);
             avB.Text = "Среднее B: " + Math.Round(analyse.getAverageGistogramm("B"), 3);
+
+            analyse.setRGB(chart1, chart2, chart3, chart4);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -400,21 +415,18 @@ namespace Diplom
             }
             reader.Close();
 
-            string R = (analyse.avR[0]).ToString(), 
-                G = (analyse.avG[0]).ToString(), 
-                B = (analyse.avB[0]).ToString();
-
-            for(int i = 1; i < analyse.avR.Length - 1; ++i)
+            string imgData = "";
+            string posData = "";
+            for (int i = 0; i < analyse.data.Length-1; ++i)
             {
-                R += ":" + analyse.avR[i];
-                G += ":" + analyse.avG[i];
-                B += ":" + analyse.avB[i];
+                imgData += analyse.data[i].getColor().R + ":" + analyse.data[i].getColor().G + ":" + analyse.data[i].getColor().B + ":";
+                posData += analyse.data[i].getPoint().X + ":" + analyse.data[i].getPoint().Y + ":";
             }
-            string avBright = "";
-            avBright = avR.Text.Substring(10) + ":" + avG.Text.Substring(10) + ":" + avB.Text.Substring(10);
+            imgData = imgData.Substring(0, imgData.Length - 1); //Удалить : в конце
+            posData = posData.Substring(0, posData.Length - 1); //Удалить : в конце
 
-            query = "INSERT INTO Gist_info (ID_photo, gistR, gistG, gistB, avBright, AllBright) "
-               + "VALUES ('" + ID_photo + "', '" + R + "', '" + G + "', '" + B + "', '" + avBright + "', '" + analyse.getAvgBrightness() + "')";
+            query = "INSERT INTO Gist_info (ID_photo, AllBright, Img, Pos) "
+               + "VALUES ('" + ID_photo + "', '" + analyse.getAvgBrightness() + "', '" + imgData + "', '" + posData +"')";
             dbCommand = new OleDbCommand(query, connection);
             dbCommand.ExecuteNonQuery();
         }
@@ -429,38 +441,32 @@ namespace Diplom
             {
                 MessageBox.Show("В БД нет информации о гистограммах к этому изображению", "Ошибка");
                 return;
-            }            
+            }
 
-            while (reader.Read())
-            {
-                analyse.setAvgBrightness(Convert.ToDouble(reader["AllBright"].ToString()));                
+            reader.Read();
 
-                try
-                {
-                    analyse.changeBrightness();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Ошибка задания новой яркости");
-                    return;
-                }
+            analyse = new pixelAnalyse(progressBar1); //Очистка и после установка всего нового
 
-                selBitmap = new Bitmap(analyse.getBitmapByInfo(new Bitmap(selBitmap.Width, selBitmap.Height))); //получение битмапа на основе данных из бд
-                pictureBox2.Image = selBitmap;
+            analyse.setAvgBrightness(Convert.ToDouble(reader["AllBright"].ToString()));
 
-                analyse.avR = Array.ConvertAll((reader["gistR"]).ToString().Split(':'), double.Parse);
-                analyse.avG = Array.ConvertAll((reader["gistG"]).ToString().Split(':'), double.Parse);
-                analyse.avB = Array.ConvertAll((reader["gistB"]).ToString().Split(':'), double.Parse);
+            string[] tempImg = (reader["Img"]).ToString().Split(':');
+            string[] tempPos = (reader["Pos"]).ToString().Split(':');
+            int countPos = 0, countClr = 0;
 
-                string[] avRGB = (reader["avBright"]).ToString().Split(':');
-                avR.Text = "Среднее R: " + avRGB[0];
-                avG.Text = "Среднее G: " + avRGB[1];
-                avB.Text = "Среднее B: " + avRGB[2];
-                avgLabel.Text = analyse.getAvgBrightness().ToString();
+            while (countPos != tempPos.Length)
+            { 
+                Color clr = Color.FromArgb(255, Convert.ToInt32(tempImg[countClr]), Convert.ToInt32(tempImg[countClr + 1]), Convert.ToInt32(tempImg[countClr + 2]));
+                Point point = new Point(Convert.ToInt32(tempPos[countPos]), Convert.ToInt32(tempPos[countPos + 1]));
+                analyse.setInfo(point, clr);
+                countPos += 2;
+                countClr += 3;
             }
             reader.Close();
 
-            analyse.setRGB(chart1, chart2, chart3, chart4);
+            selBitmap = new Bitmap(analyse.getBitmapByInfo(new Bitmap(selBitmap.Width, selBitmap.Height))); //получение битмапа на основе данных из бд
+            pictureBox2.Image = selBitmap;
+
+            ReDisplayInfo();         
         }
 
         private void FilterButton_Click(object sender, EventArgs e) //Применить параметры фильтрации
