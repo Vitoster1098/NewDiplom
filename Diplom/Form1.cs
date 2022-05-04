@@ -356,11 +356,6 @@ namespace Diplom
             avG.Text = "Среднее G: " + Math.Round(analyse.getAverageGistogramm("G"), 3);
             avB.Text = "Среднее B: " + Math.Round(analyse.getAverageGistogramm("B"), 3);
 
-            chart1.Series[0].Points.Clear();
-            chart2.Series[0].Points.Clear();
-            chart3.Series[0].Points.Clear();
-            chart4.Series[0].Points.Clear();
-
             analyse.setRGB(chart1, chart2, chart3, chart4);
         }
 
