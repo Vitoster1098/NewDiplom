@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Diplom
 {
@@ -99,25 +100,33 @@ namespace Diplom
             string varPos = "";
             string varRGB = "";
 
-            for (int i = 0; i < image.Width; ++i)
+            try
             {
-                for (int j = 0; j < image.Height; ++j)
+                for (int i = 0; i < image.Width; ++i)
                 {
-                    if (image.GetPixel(i, j).R == 255 && image.GetPixel(i, j).G == 255 && image.GetPixel(i, j).B == 255)
+                    for (int j = 0; j < image.Height; ++j)
                     {
-                        continue;
-                    }                        
-                    else
-                    {
-                        //addData(image.GetPixel(i, j).R, image.GetPixel(i, j).G, image.GetPixel(i, j).B, Path.Combine(dn, Path.GetFileName(path)), diagnose, i, j);
-                        varPos += i + ":" + j + ":";
-                        varRGB += image.GetPixel(i, j).R + ":" + image.GetPixel(i, j).G + ":" + image.GetPixel(i, j).B + ":";
+                        if (image.GetPixel(i, j).R == 255 && image.GetPixel(i, j).G == 255 && image.GetPixel(i, j).B == 255)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            //addData(image.GetPixel(i, j).R, image.GetPixel(i, j).G, image.GetPixel(i, j).B, Path.Combine(dn, Path.GetFileName(path)), diagnose, i, j);
+                            varPos += i + ":" + j + ":";
+                            varRGB += image.GetPixel(i, j).R + ":" + image.GetPixel(i, j).G + ":" + image.GetPixel(i, j).B + ":";
+                        }
                     }
                 }
+                varPos = varPos.Substring(0, varPos.Length - 1);
+                varRGB = varRGB.Substring(0, varRGB.Length - 1);
+                addData(Path.Combine(dn, Path.GetFileName(path)), varPos, varRGB);
             }
-            varPos = varPos.Substring(0, varPos.Length - 1);
-            varRGB = varRGB.Substring(0, varRGB.Length - 1);
-            addData(Path.Combine(dn, Path.GetFileName(path)), varPos, varRGB);
+            catch (Exception ex)
+            {
+                //Console.WriteLine("Встречен сложный запрос: " + ex.Message);
+                Debug.WriteLine("Встречен сложный запрос: " + ex.Message);
+            }
         }
 
         //void addData(byte R, byte G, byte B, string path, string diagnose, int x, int y) //Заполнение информации о пикселях изображений
