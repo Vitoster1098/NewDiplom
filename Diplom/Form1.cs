@@ -92,27 +92,41 @@ namespace Diplom
             var dn = Path.GetDirectoryName(path);
             dn = dn.Substring(dn.LastIndexOf('\\') + 1); //Имя последней папки
 
-
             string query = "INSERT INTO Exsamples (Path, Diagnose) VALUES ('" + Path.Combine(dn, Path.GetFileName(path)) + "', '" + diagnose + "')";
             dbCommand = new OleDbCommand(query, connection);
             dbCommand.ExecuteNonQuery();
+
+            string varPos = "";
+            string varRGB = "";
 
             for (int i = 0; i < image.Width; ++i)
             {
                 for (int j = 0; j < image.Height; ++j)
                 {
                     if (image.GetPixel(i, j).R == 255 && image.GetPixel(i, j).G == 255 && image.GetPixel(i, j).B == 255)
+                    {
                         continue;
+                    }                        
                     else
-                        addData(image.GetPixel(i, j).R, image.GetPixel(i, j).G, image.GetPixel(i, j).B, Path.Combine(dn, Path.GetFileName(path)), diagnose, i, j);
+                    {
+                        //addData(image.GetPixel(i, j).R, image.GetPixel(i, j).G, image.GetPixel(i, j).B, Path.Combine(dn, Path.GetFileName(path)), diagnose, i, j);
+                        varPos += i + ":" + j + ":";
+                        varRGB += image.GetPixel(i, j).R + ":" + image.GetPixel(i, j).G + ":" + image.GetPixel(i, j).B + ":";
+                    }
                 }
             }
+            varPos = varPos.Substring(0, varPos.Length - 1);
+            varRGB = varRGB.Substring(0, varRGB.Length - 1);
+            addData(Path.Combine(dn, Path.GetFileName(path)), varPos, varRGB);
         }
 
-        void addData(byte R, byte G, byte B, string path, string diagnose, int x, int y) //Заполнение информации о пикселях изображений
+        //void addData(byte R, byte G, byte B, string path, string diagnose, int x, int y) //Заполнение информации о пикселях изображений
+        void addData(string path, string Pos, string RGB) //Заполнение информации о пикселях изображений
         {
-            string query = "INSERT INTO Spot_info (ID_photo, X_point, Y_point, R, G, B) "
-                + "VALUES ('" + path + "', " + x + ", " + y + ", " + R + ", " + G + ", " + B + ")";
+            /*string query = "INSERT INTO Spot_info (ID_photo, X_point, Y_point, R, G, B) "
+                + "VALUES ('" + path + "', " + x + ", " + y + ", " + R + ", " + G + ", " + B + ")";*/
+            string query = "INSERT INTO Spot_info (ID_photo, PosXY, RGB) "
+                + "VALUES ('" + path + "', '" + Pos + "', '" + RGB + "')";
             dbCommand = new OleDbCommand(query, connection);
             dbCommand.ExecuteNonQuery();
         }
@@ -232,59 +246,37 @@ namespace Diplom
             //MessageBox.Show(progpath.ToString() + listBox1.Items[listBox1.SelectedIndex].ToString(), "Уведомление");
             try 
             {
-                string newpath = listBox1.Items[listBox1.SelectedIndex].ToString().Substring(1);               
+                string newpath = listBox1.Items[listBox1.SelectedIndex].ToString().Substring(1);
 
-                string query = @"SELECT * FROM Spot_info WHERE ID_photo='" + newpath + "'";
+                string query = "SELECT * FROM Spot_info WHERE ID_photo='" + newpath + "'";
                 dbCommand = new OleDbCommand(query, connection);
                 OleDbDataReader reader = dbCommand.ExecuteReader();
 
                 analyse = new pixelAnalyse(progressBar1); //очистка
 
-                while (reader.Read())
-                {
-                    try
+                reader.Read();                
+                
+                    //analyse.setInfo(new Point((int)reader["X_point"], (int)reader["Y_point"]), Color.FromArgb(255, (int)reader["R"], (int)reader["G"], (int)reader["B"]));
+                    string[] tempImg = (reader["RGB"]).ToString().Split(':');
+                    string[] tempPos = (reader["PosXY"]).ToString().Split(':');
+                    int countPos = 0, countClr = 0;
+
+                    while (countPos != tempPos.Length)
                     {
-                        analyse.setInfo(new Point((int)reader["X_point"], (int)reader["Y_point"]), Color.FromArgb(255, (int)reader["R"], (int)reader["G"], (int)reader["B"]));
+                        Color clr = Color.FromArgb(255, Convert.ToInt32(tempImg[countClr]), Convert.ToInt32(tempImg[countClr + 1]), Convert.ToInt32(tempImg[countClr + 2]));
+                        Point point = new Point(Convert.ToInt32(tempPos[countPos]), Convert.ToInt32(tempPos[countPos + 1]));
+                        analyse.setInfo(point, clr);
+                        countPos += 2;
+                        countClr += 3;
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message + "\r\n" + "X:" + (int)reader["X_point"] + "\r\n" + "Y:" + (int)reader["Y_point"], "Ошибка присвоения цвета");
-                    }
-                }
+                    reader.Close();                                 
 
                 Bitmap fromBase = new Bitmap(analyse.getMax(true) + 1, analyse.getMax(false) + 1);
 
                 selBitmap = analyse.getBitmapByInfo(fromBase);
                 pictureBox2.Image = selBitmap;
 
-                analyse.wR = analyse.getAvgFrequency("R");
-                analyse.wG = analyse.getAvgFrequency("G");
-                analyse.wB = analyse.getAvgFrequency("B");
-                avgBrightness = analyse.getAverageBrightness();
-
-                analyse.calcMed();
-                analyse.calcDefl();
-
-                DeflRLabel.Text = "Ср.кв.откл R:" + Math.Round(analyse.getSg()[0], 3);
-                DeflGLabel.Text = "Ср.кв.откл G:" + Math.Round(analyse.getSg()[1], 3);
-                DeflBLabel.Text = "Ср.кв.откл B:" + Math.Round(analyse.getSg()[2], 3);
-
-                MedRLabel.Text = "Медиана R:" + Math.Round(analyse.getMed()[0], 3);
-                MedGLabel.Text = "Медиана G:" + Math.Round(analyse.getMed()[1], 3);
-                MedBLabel.Text = "Медиана B:" + Math.Round(analyse.getMed()[2], 3);
-
-                avgLabel.Text = "Средняя яркость: " + Math.Round(avgBrightness, 2);
-                avR.Text = "Среднее R: " + Math.Round(analyse.getAverageGistogramm("R"), 3);
-                avG.Text = "Среднее G: " + Math.Round(analyse.getAverageGistogramm("G"), 3);
-                avB.Text = "Среднее B: " + Math.Round(analyse.getAverageGistogramm("B"), 3);
-
-                chart1.Series[0].Points.Clear();
-                chart2.Series[0].Points.Clear();
-                chart3.Series[0].Points.Clear();
-                chart4.Series[0].Points.Clear();
-                chart4.Series[1].Points.Clear();
-                chart4.Series[2].Points.Clear();
-                analyse.setRGB(chart1, chart2, chart3, chart4);
+                ReDisplayInfo();
             }
             catch (Exception ex)
             {
@@ -358,11 +350,16 @@ namespace Diplom
             MedGLabel.Text = "Медиана G:" + Math.Round(analyse.getMed()[1], 3);
             MedBLabel.Text = "Медиана B:" + Math.Round(analyse.getMed()[2], 3);
 
-            avgBrightness = analyse.getAvgBrightness();
+            avgBrightness = analyse.getAverageBrightness();
             avgLabel.Text = "Средняя яркость: " + Math.Round(avgBrightness, 3);
             avR.Text = "Среднее R: " + Math.Round(analyse.getAverageGistogramm("R"), 3);
             avG.Text = "Среднее G: " + Math.Round(analyse.getAverageGistogramm("G"), 3);
             avB.Text = "Среднее B: " + Math.Round(analyse.getAverageGistogramm("B"), 3);
+
+            chart1.Series[0].Points.Clear();
+            chart2.Series[0].Points.Clear();
+            chart3.Series[0].Points.Clear();
+            chart4.Series[0].Points.Clear();
 
             analyse.setRGB(chart1, chart2, chart3, chart4);
         }
