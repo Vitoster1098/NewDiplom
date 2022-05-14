@@ -208,7 +208,7 @@ namespace Diplom
                 //D += (i * i * wR[i]) - (y * y);
                 D += Math.Pow((i - y), 2) * wR[i];
             }            
-            setSg(0, Math.Sqrt(Math.Abs(D)));
+            setSg(0, Math.Sqrt(D));
             MessageBox.Show("Дисперсия R:" + D + "\r\nОтклонение:" + Sg[0]);
 
             y = 0;
@@ -224,7 +224,7 @@ namespace Diplom
                 D += Math.Pow((i - y), 2) * wG[i];
             }
             
-            setSg(1, Math.Sqrt(Math.Abs(D)));
+            setSg(1, Math.Sqrt(D));
             MessageBox.Show("Дисперсия G:" + D + "\r\nОтклонение:" + Sg[1]);
 
             y = 0;
@@ -239,7 +239,7 @@ namespace Diplom
                 //D += (i * i * wB[i]) - (y * y);
                 D += Math.Pow((i - y), 2) * wB[i];
             }            
-            setSg(2, Math.Sqrt(Math.Abs(D)));
+            setSg(2, Math.Sqrt(D));
             MessageBox.Show("Дисперсия B:" + D + "\r\nОтклонение:" + Sg[2]);
         }
 
