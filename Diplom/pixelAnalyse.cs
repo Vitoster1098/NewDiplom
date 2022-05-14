@@ -198,46 +198,49 @@ namespace Diplom
         {
             double y = 0, D = 0;
 
-            for (int i = 0; i < 255; ++i)
+            for (int i = 0; i < 256; ++i)
             {
                 y += wR[i] * i;
             }
             //MessageBox.Show("Среднее:"+y);
-            for (int i = 0; i < 255; ++i)
+            for (int i = 0; i < 256; ++i)
             {
-                D += (Math.Pow(i, 2) * wR[i]) - Math.Pow(y, 2);
+                //D += (i * i * wR[i]) - (y * y);
+                D += Math.Pow((i - y), 2) * wR[i];
             }            
             setSg(0, Math.Sqrt(Math.Abs(D)));
-            //MessageBox.Show("Дисперсия R:" + D + "\r\nОтклонение:" + Sg[0]);
+            MessageBox.Show("Дисперсия R:" + D + "\r\nОтклонение:" + Sg[0]);
 
             y = 0;
             D = 0;
-            for (int i = 0; i < 255; ++i)
+            for (int i = 0; i < 256; ++i)
             {
                 y += wG[i] * i;
             }
             //MessageBox.Show("Среднее:"+y);
-            for (int i = 0; i < 255; ++i)
+            for (int i = 0; i < 256; ++i)
             {
-                D += (Math.Pow(i, 2) * wG[i]) - Math.Pow(y, 2);
+                //D += (i * i * wG[i]) - (y * y);
+                D += Math.Pow((i - y), 2) * wG[i];
             }
             
             setSg(1, Math.Sqrt(Math.Abs(D)));
-            //MessageBox.Show("Дисперсия G:" + D + "\r\nОтклонение:" + Sg[1]);
+            MessageBox.Show("Дисперсия G:" + D + "\r\nОтклонение:" + Sg[1]);
 
             y = 0;
             D = 0;
-            for (int i = 0; i < 255; ++i)
+            for (int i = 0; i < 256; ++i)
             {
                 y += wB[i] * i;
             }
             //MessageBox.Show("Среднее:"+y);
-            for (int i = 0; i < 255; ++i)
+            for (int i = 0; i < 256; ++i)
             {
-                D += (Math.Pow(i, 2) * wB[i]) - Math.Pow(y, 2);
+                //D += (i * i * wB[i]) - (y * y);
+                D += Math.Pow((i - y), 2) * wB[i];
             }            
             setSg(2, Math.Sqrt(Math.Abs(D)));
-            //MessageBox.Show("Дисперсия B:" + D + "\r\nОтклонение:" + Sg[2]);
+            MessageBox.Show("Дисперсия B:" + D + "\r\nОтклонение:" + Sg[2]);
         }
 
         public void calcMed()
@@ -322,30 +325,30 @@ namespace Diplom
             {
                 case "R":
                     {
-                        for(int i = 0; i < avR.Length - 1; ++i)
+                        for (int i = 0; i < 256; ++i)
                         {
-                            av += (avR[i] / 255) * i;
+                            av += wR[i]  * i;
                         }
                         break;
                     }
                 case "G":
                     {
-                        for (int i = 0; i < avG.Length - 1; ++i)
+                        for (int i = 0; i < 256; ++i)
                         {
-                            av += (avG[i] / 255) * i;
+                            av += wG[i] * i;
                         }
                         break;
                     }
                 case "B":
                     {
-                        for (int i = 0; i < avB.Length - 1; ++i)
+                        for (int i = 0; i < 256; ++i)
                         {
-                            av += (avB[i] / 255) * i;
+                            av += wB[i] * i;
                         }
                         break;
                     }
             }
-            return av / 255;
+            return av;
         }
 
         public double[] getAvgFrequency(string type)
