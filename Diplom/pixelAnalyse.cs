@@ -209,7 +209,7 @@ namespace Diplom
                 D += Math.Pow((i - y), 2) * wR[i];
             }            
             setSg(0, Math.Sqrt(D));
-            MessageBox.Show("Дисперсия R:" + D + "\r\nОтклонение:" + Sg[0]);
+            //MessageBox.Show("Дисперсия R:" + D + "\r\nОтклонение:" + Sg[0]);
 
             y = 0;
             D = 0;
@@ -225,7 +225,7 @@ namespace Diplom
             }
             
             setSg(1, Math.Sqrt(D));
-            MessageBox.Show("Дисперсия G:" + D + "\r\nОтклонение:" + Sg[1]);
+            //MessageBox.Show("Дисперсия G:" + D + "\r\nОтклонение:" + Sg[1]);
 
             y = 0;
             D = 0;
@@ -240,7 +240,7 @@ namespace Diplom
                 D += Math.Pow((i - y), 2) * wB[i];
             }            
             setSg(2, Math.Sqrt(D));
-            MessageBox.Show("Дисперсия B:" + D + "\r\nОтклонение:" + Sg[2]);
+            //MessageBox.Show("Дисперсия B:" + D + "\r\nОтклонение:" + Sg[2]);
         }
 
         public void calcMed()
