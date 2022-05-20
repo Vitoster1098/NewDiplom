@@ -4,8 +4,6 @@ using System.Windows.Forms;
 using System.Data.OleDb;
 using System.IO;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 namespace Diplom
