@@ -405,14 +405,6 @@ namespace Diplom
             string query = "SELECT COUNT(*) AS num FROM Gist_info WHERE ID_photo='" + ID_photo + "'";
             dbCommand = new OleDbCommand(query, connection);
             OleDbDataReader reader = dbCommand.ExecuteReader();
-            reader.Read();
-            if ((int)reader["num"] != 0)
-            {
-                MessageBox.Show("В БД уже есть информация о гистограммах к этому изображению", "Ошибка");
-                reader.Close();
-                return;
-            }
-            reader.Close();
 
             string imgData = "";
             string posData = "";
@@ -424,10 +416,34 @@ namespace Diplom
             imgData = imgData.Substring(0, imgData.Length - 1); //Удалить : в конце
             posData = posData.Substring(0, posData.Length - 1); //Удалить : в конце
 
-            query = "INSERT INTO Gist_info (ID_photo, AllBright, Img, Pos) "
-               + "VALUES ('" + ID_photo + "', '" + analyse.getAvgBrightness() + "', '" + imgData + "', '" + posData +"')";
-            dbCommand = new OleDbCommand(query, connection);
-            dbCommand.ExecuteNonQuery();
+            string avRGB = Math.Round(analyse.getAverageGistogramm("R"), 3) + ":" + Math.Round(analyse.getAverageGistogramm("G"), 3) + ":" + Math.Round(analyse.getAverageGistogramm("B"), 3);
+            string MedRGB = analyse.getMed()[0] + ":" + analyse.getMed()[1] + ":" + analyse.getMed()[2];
+            string SgRGB = analyse.getSg()[0] + ":" + analyse.getSg()[1] + ":" + analyse.getSg()[2];
+            
+            reader.Read();
+            if ((int)reader["num"] != 0) //Если есть запись
+            {
+                query = "UPDATE Gist_info WHERE ID_photo='" + ID_photo + "' SET AllBright='" + analyse.getAvgBrightness() + "', " +
+                    "BrightRGB='"+ avRGB + "', Img='"+ imgData + "', Pos='" + posData +"', MedRGB='" + MedRGB + "', SgRGB='"+SgRGB+"'";
+            }
+            else
+            {
+                query = "INSERT INTO Gist_info (ID_photo, AllBright, BrightRGB, Img, Pos, MedRGB, SgRGB) "
+               + "VALUES ('" + ID_photo + "', '" + analyse.getAvgBrightness() + "', '" + avRGB + "', '" + imgData + "', '" + posData + "', " +
+               "'" + MedRGB + "', '" + SgRGB + "')";
+            }
+            reader.Close();
+
+            try
+            {
+                dbCommand = new OleDbCommand(query, connection);
+                dbCommand.ExecuteNonQuery();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка сохранения исследования");
+                return;
+            }
         }
 
         private void загрузитьToolStripMenuItem_Click(object sender, EventArgs e) //Загрузить данные гистограммы из БД
