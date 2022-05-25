@@ -75,6 +75,19 @@ namespace Diplom
             MedBLabel.Text = "Медиана B:";            
         }
 
+        int GetId(string path)
+        {
+            string query = "SELECT ID FROM Exsamples WHERE Path='" + path + "'";
+            dbCommand = new OleDbCommand(query, connection);
+            dbCommand.ExecuteNonQuery();
+
+            OleDbDataReader reader = dbCommand.ExecuteReader();
+            reader.Read();
+            int id = (int)reader["ID"];
+            reader.Close();
+            return id;            
+        }
+
         public void ScanFile(string path, string diagnose)
         {
             Bitmap image;
@@ -93,7 +106,7 @@ namespace Diplom
 
             string query = "INSERT INTO Exsamples (Path, Diagnose) VALUES ('" + Path.Combine(dn, Path.GetFileName(path)) + "', '" + diagnose + "')";
             dbCommand = new OleDbCommand(query, connection);
-            dbCommand.ExecuteNonQuery();
+            dbCommand.ExecuteNonQuery();            
 
             string varPos = "";
             string varRGB = "";
@@ -118,22 +131,26 @@ namespace Diplom
                 }
                 varPos = varPos.Substring(0, varPos.Length - 1);
                 varRGB = varRGB.Substring(0, varRGB.Length - 1);
-                addData(Path.Combine(dn, Path.GetFileName(path)), varPos, varRGB);
+                addData(varPos, varRGB, GetId(Path.Combine(dn, Path.GetFileName(path))));
             }
             catch (Exception ex)
             {
                 //Console.WriteLine("Встречен сложный запрос: " + ex.Message);
                 Debug.WriteLine("Встречен сложный запрос: " + ex.Message);
+                query = "DELETE FROM Exsamples WHERE Path='" + Path.Combine(dn, Path.GetFileName(path)) + "'";
+                dbCommand = new OleDbCommand(query, connection);
+                dbCommand.ExecuteNonQuery();
             }
         }
 
-        //void addData(byte R, byte G, byte B, string path, string diagnose, int x, int y) //Заполнение информации о пикселях изображений
-        void addData(string path, string Pos, string RGB) //Заполнение информации о пикселях изображений
+        void addData(string Pos, string RGB, int id) //Заполнение информации о пикселях изображений
         {
-            /*string query = "INSERT INTO Spot_info (ID_photo, X_point, Y_point, R, G, B) "
-                + "VALUES ('" + path + "', " + x + ", " + y + ", " + R + ", " + G + ", " + B + ")";*/
-            string query = "INSERT INTO Spot_info (ID_photo, PosXY, RGB) "
-                + "VALUES ('" + path + "', '" + Pos + "', '" + RGB + "')";
+            string query = "INSERT INTO Spot_info (ID_photo, PosXY, RGB) " +
+                            "VALUES(@ID_photo, @PosXY, @RGB)";
+            dbCommand = new OleDbCommand(query, connection);
+            dbCommand.Parameters.AddWithValue("@ID_photo", id);
+            dbCommand.Parameters.AddWithValue("@PosXY", Pos);
+            dbCommand.Parameters.AddWithValue("@RGB", RGB);
             dbCommand = new OleDbCommand(query, connection);
             dbCommand.ExecuteNonQuery();
         }
@@ -255,7 +272,9 @@ namespace Diplom
             {
                 string newpath = listBox1.Items[listBox1.SelectedIndex].ToString().Substring(1);
 
-                string query = "SELECT * FROM Spot_info WHERE ID_photo='" + newpath + "'";
+                int id = GetId(newpath);
+
+                string query = "SELECT * FROM Spot_info WHERE ID_photo=" + id;
                 dbCommand = new OleDbCommand(query, connection);
                 OleDbDataReader reader = dbCommand.ExecuteReader();
 
@@ -333,8 +352,9 @@ namespace Diplom
                 MessageBox.Show(ex.Message, "Ошибка задания новой яркости");
                 return;
             }
+            Bitmap fromBase = new Bitmap(analyse.getMax(true) + 1, analyse.getMax(false) + 1);
 
-            selBitmap = new Bitmap(analyse.getBitmapByInfo(new Bitmap(selBitmap.Width, selBitmap.Height))); //получение битмапа на основе данных из бд
+            selBitmap = analyse.getBitmapByInfo(fromBase);
             pictureBox2.Image = selBitmap;
 
             ReDisplayInfo();
@@ -399,12 +419,18 @@ namespace Diplom
         private void сохранитьГистограммToolStripMenuItem_Click(object sender, EventArgs e) //Сохранить данные гистограммы в БД
         {
             if(analyse.data.Length == 1) { return; }
-            string ID_photo = listBox1.SelectedItem.ToString();//.Substring(1);
-            //MessageBox.Show(ID_photo);
+            string path = listBox1.SelectedItem.ToString().Substring(1);
+            int id = GetId(path);
 
-            string query = "SELECT COUNT(*) AS num FROM Gist_info WHERE ID_photo='" + ID_photo + "'";
+            string query = "SELECT Diagnose FROM Exsamples WHERE ID="+id;
             dbCommand = new OleDbCommand(query, connection);
             OleDbDataReader reader = dbCommand.ExecuteReader();
+            reader.Read();
+            string Diagnose = (reader["Diagnose"]).ToString();
+            reader.Close();
+            query = "SELECT COUNT(*) AS num FROM Gist_info WHERE ID_photo=" + id;
+            dbCommand = new OleDbCommand(query, connection);
+            reader = dbCommand.ExecuteReader();
 
             string imgData = "";
             string posData = "";
@@ -416,39 +442,77 @@ namespace Diplom
             imgData = imgData.Substring(0, imgData.Length - 1); //Удалить : в конце
             posData = posData.Substring(0, posData.Length - 1); //Удалить : в конце
 
-            string avRGB = Math.Round(analyse.getAverageGistogramm("R"), 3) + ":" + Math.Round(analyse.getAverageGistogramm("G"), 3) + ":" + Math.Round(analyse.getAverageGistogramm("B"), 3);
-            string MedRGB = analyse.getMed()[0] + ":" + analyse.getMed()[1] + ":" + analyse.getMed()[2];
-            string SgRGB = analyse.getSg()[0] + ":" + analyse.getSg()[1] + ":" + analyse.getSg()[2];
-            
+            dbCommand = new OleDbCommand(query, connection);
+            dbCommand.ExecuteNonQuery();
+
+            string avR = analyse.getAverageGistogramm("R").ToString();
+            string avG = analyse.getAverageGistogramm("G").ToString();
+            string avB = analyse.getAverageGistogramm("B").ToString();
+            string MedR = analyse.getMed()[0].ToString();
+            string MedG = analyse.getMed()[1].ToString();
+            string MedB = analyse.getMed()[2].ToString();
+            string SgR = analyse.getSg()[0].ToString();
+            string SgG = analyse.getSg()[1].ToString();
+            string SgB = analyse.getSg()[2].ToString();
+            string AllBright = analyse.getAvgBrightness().ToString();
+
+
             reader.Read();
             if ((int)reader["num"] != 0) //Если есть запись
             {
-                query = "UPDATE Gist_info WHERE ID_photo='" + ID_photo + "' SET AllBright='" + analyse.getAvgBrightness() + "', " +
-                    "BrightRGB='"+ avRGB + "', Img='"+ imgData + "', Pos='" + posData +"', MedRGB='" + MedRGB + "', SgRGB='"+SgRGB+"'";
+                query = "UPDATE Gist_info SET [Diagnose]=@Diagnose [AllBright]=@AllBright, [avR]=@avR, [avG]=@avG, [avB]=@avB, [Img]=@Img, [Pos]=@Pos, [MedR]=@MedR, [MedG]=@MedG, [MedB]=@MedB, [SgR]=@SgR, [SgG]=@SgG, [SgB]=@SgB";
+                dbCommand = new OleDbCommand(query, connection);
+                dbCommand.Parameters.AddWithValue("@AllBright", AllBright);
+                dbCommand.Parameters.AddWithValue("@avR", avR);
+                dbCommand.Parameters.AddWithValue("@avG", avG);
+                dbCommand.Parameters.AddWithValue("@avB", avB);
+                dbCommand.Parameters.AddWithValue("@Img", imgData);
+                dbCommand.Parameters.AddWithValue("@Pos", posData);
+                dbCommand.Parameters.AddWithValue("@MedR", MedR);
+                dbCommand.Parameters.AddWithValue("@MedG", MedG);
+                dbCommand.Parameters.AddWithValue("@MedB", MedB);
+                dbCommand.Parameters.AddWithValue("@SgR", SgR);
+                dbCommand.Parameters.AddWithValue("@SgG", SgG);
+                dbCommand.Parameters.AddWithValue("@SgB", SgB);
+                dbCommand.Parameters.AddWithValue("@Diagnose", Diagnose);
             }
             else
-            {
-                query = "INSERT INTO Gist_info (ID_photo, AllBright, BrightRGB, Img, Pos, MedRGB, SgRGB) "
-               + "VALUES ('" + ID_photo + "', '" + analyse.getAvgBrightness() + "', '" + avRGB + "', '" + imgData + "', '" + posData + "', " +
-               "'" + MedRGB + "', '" + SgRGB + "')";
+            {                
+                query = "INSERT INTO Gist_info ([ID_photo], [AllBright], [avR], [avG], [avB], [Img], [Pos], [MedR], [MedG], [MedB], [SgR], [SgG], [SgB], [Diagnose]) " +
+                    "VALUES(@ID_photo, @AllBright, @avR, @avG, @avB, @Img, @Pos, @MedR, @MedG, @MedB, @SrR, @SrG, @SrB, @Diagnose)";
+                dbCommand = new OleDbCommand(query, connection);
+                dbCommand.Parameters.AddWithValue("@ID_photo", id);
+                dbCommand.Parameters.AddWithValue("@AllBright", AllBright);
+                dbCommand.Parameters.AddWithValue("@avR", avR);
+                dbCommand.Parameters.AddWithValue("@avG", avG);
+                dbCommand.Parameters.AddWithValue("@avB", avB);
+                dbCommand.Parameters.AddWithValue("@Img", imgData);
+                dbCommand.Parameters.AddWithValue("@Pos", posData);
+                dbCommand.Parameters.AddWithValue("@MedR", MedR);
+                dbCommand.Parameters.AddWithValue("@MedG", MedG);
+                dbCommand.Parameters.AddWithValue("@MedB", MedB);
+                dbCommand.Parameters.AddWithValue("@SgR", SgR);
+                dbCommand.Parameters.AddWithValue("@SgG", SgG);
+                dbCommand.Parameters.AddWithValue("@SgB", SgB);
+                dbCommand.Parameters.AddWithValue("@Diagnose", Diagnose);
             }
             reader.Close();
-
             try
             {
-                dbCommand = new OleDbCommand(query, connection);
                 dbCommand.ExecuteNonQuery();
             }
             catch(Exception ex)
             {
                 MessageBox.Show(ex.Message, "Ошибка сохранения исследования");
+                reader.Close();
                 return;
             }
         }
 
         private void загрузитьToolStripMenuItem_Click(object sender, EventArgs e) //Загрузить данные гистограммы из БД
         {
-            string query = @"SELECT * FROM Gist_info WHERE ID_photo ='" + listBox1.SelectedItem.ToString() + "'";
+            int id = GetId(listBox1.SelectedItem.ToString().Substring(1));
+            string query = @"SELECT * FROM Gist_info WHERE ID_photo =" + id;
             dbCommand = new OleDbCommand(query, connection);
             OleDbDataReader reader = dbCommand.ExecuteReader();
 
@@ -464,6 +528,7 @@ namespace Diplom
 
             string[] tempImg = (reader["Img"]).ToString().Split(':');
             string[] tempPos = (reader["Pos"]).ToString().Split(':');
+
             int countPos = 0, countClr = 0;
 
             while (countPos != tempPos.Length)
@@ -528,7 +593,139 @@ namespace Diplom
                 progressBar1.Value++;
             }
             fillListbox();
-        }        
+        }
+
+        private void заполнитьДанныеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(connectionString == "") { return; }
+            string query = "SELECT ID FROM Exsamples";
+            dbCommand = new OleDbCommand(query, connection);
+
+            OleDbDataReader reader = dbCommand.ExecuteReader();
+            while (reader.Read())
+            {
+                try
+                {                   
+                    query = "SELECT Diagnose FROM Exsamples WHERE ID=" + reader["ID"];
+                    dbCommand = new OleDbCommand(query, connection);
+                    OleDbDataReader reader1 = dbCommand.ExecuteReader();
+                    reader1.Read();
+                    string Diagnose = (reader1["Diagnose"]).ToString();
+                    reader1.Close();
+
+                    query = "SELECT * FROM Spot_info WHERE ID_photo=" + (reader["ID"]);
+                    dbCommand = new OleDbCommand(query, connection);
+                    reader1 = dbCommand.ExecuteReader();
+                    analyse = new pixelAnalyse(progressBar1); //очистка
+
+                    reader1.Read();
+
+                    //analyse.setInfo(new Point((int)reader["X_point"], (int)reader["Y_point"]), Color.FromArgb(255, (int)reader["R"], (int)reader["G"], (int)reader["B"]));
+                    string[] tempImg = (reader1["RGB"]).ToString().Split(':');
+                    string[] tempPos = (reader1["PosXY"]).ToString().Split(':');                    
+                    int countPos = 0, countClr = 0;
+
+                    while (countPos != tempPos.Length)
+                    {
+                        Color clr = Color.FromArgb(255, Convert.ToInt32(tempImg[countClr]), Convert.ToInt32(tempImg[countClr + 1]), Convert.ToInt32(tempImg[countClr + 2]));
+                        Point point = new Point(Convert.ToInt32(tempPos[countPos]), Convert.ToInt32(tempPos[countPos + 1]));
+                        analyse.setInfo(point, clr);
+                        countPos += 2;
+                        countClr += 3;
+                    }
+                    reader1.Close();
+
+                    
+
+                    button1_Click(sender, e);
+                    button1_Click(sender, e);
+                    button1_Click(sender, e);
+
+                    query = "SELECT COUNT(*) AS num FROM Gist_info WHERE ID_photo=" + reader["ID"];
+                    dbCommand = new OleDbCommand(query, connection);
+                    reader1 = dbCommand.ExecuteReader();
+
+                    string imgData = "";
+                    string posData = "";
+                    for (int i = 0; i < analyse.data.Length - 1; ++i)
+                    {
+                        imgData += analyse.data[i].getColor().R + ":" + analyse.data[i].getColor().G + ":" + analyse.data[i].getColor().B + ":";
+                        posData += analyse.data[i].getPoint().X + ":" + analyse.data[i].getPoint().Y + ":";
+                    }
+                    imgData = imgData.Substring(0, imgData.Length - 1); //Удалить : в конце
+                    posData = posData.Substring(0, posData.Length - 1); //Удалить : в конце
+
+                    string avR = analyse.getAverageGistogramm("R").ToString();
+                    string avG = analyse.getAverageGistogramm("G").ToString();
+                    string avB = analyse.getAverageGistogramm("B").ToString();
+                    string MedR = analyse.getMed()[0].ToString();
+                    string MedG = analyse.getMed()[1].ToString();
+                    string MedB = analyse.getMed()[2].ToString();
+                    string SgR = analyse.getSg()[0].ToString();
+                    string SgG = analyse.getSg()[1].ToString();
+                    string SgB = analyse.getSg()[2].ToString();
+                    string AllBright = analyse.getAvgBrightness().ToString();
+
+                    reader1.Read();
+                    if ((int)reader1["num"] != 0) //Если есть запись
+                    {
+                        query = "UPDATE Gist_info SET [AllBright]=@AllBright, [avR]=@avR, [avG]=@avG, [avB]=@avB, [Img]=@Img, [Pos]=@Pos, [MedR]=@MedR, [MedG]=@MedG, [MedB]=@MedB, [SgR]=@SgR, [SgG]=@SgG, [SgB]=@SgB, [Diagnose]=@Diagnose";
+                        dbCommand = new OleDbCommand(query, connection);
+                        dbCommand.Parameters.AddWithValue("@AllBright", AllBright);
+                        dbCommand.Parameters.AddWithValue("@avR", avR);
+                        dbCommand.Parameters.AddWithValue("@avG", avG);
+                        dbCommand.Parameters.AddWithValue("@avB", avB);
+                        dbCommand.Parameters.AddWithValue("@Img", imgData);
+                        dbCommand.Parameters.AddWithValue("@Pos", posData);
+                        dbCommand.Parameters.AddWithValue("@MedR", MedR);
+                        dbCommand.Parameters.AddWithValue("@MedG", MedG);
+                        dbCommand.Parameters.AddWithValue("@MedB", MedB);
+                        dbCommand.Parameters.AddWithValue("@SgR", SgR);
+                        dbCommand.Parameters.AddWithValue("@SgG", SgG);
+                        dbCommand.Parameters.AddWithValue("@SgB", SgB);
+                        dbCommand.Parameters.AddWithValue("@Diagnose", Diagnose);
+                    }
+                    else
+                    {
+                        query = "INSERT INTO Gist_info ([ID_photo], [AllBright], [avR], [avG], [avB], [Img], [Pos], [MedR], [MedG], [MedB], [SgR], [SgG], [SgB], [Diagnose]) " +
+                            "VALUES(@ID_photo, @AllBright, @avR, @avG, @avB, @Img, @Pos, @MedR, @MedG, @MedB, @SrR, @SrG, @SrB, @Diagnose)";
+                        dbCommand = new OleDbCommand(query, connection);
+                        dbCommand.Parameters.AddWithValue("@ID_photo", (reader["ID"]));
+                        dbCommand.Parameters.AddWithValue("@AllBright", AllBright);
+                        dbCommand.Parameters.AddWithValue("@avR", avR);
+                        dbCommand.Parameters.AddWithValue("@avG", avG);
+                        dbCommand.Parameters.AddWithValue("@avB", avB);
+                        dbCommand.Parameters.AddWithValue("@Img", imgData);
+                        dbCommand.Parameters.AddWithValue("@Pos", posData);
+                        dbCommand.Parameters.AddWithValue("@MedR", MedR);
+                        dbCommand.Parameters.AddWithValue("@MedG", MedG);
+                        dbCommand.Parameters.AddWithValue("@MedB", MedB);
+                        dbCommand.Parameters.AddWithValue("@SgR", SgR);
+                        dbCommand.Parameters.AddWithValue("@SgG", SgG);
+                        dbCommand.Parameters.AddWithValue("@SgB", SgB);
+                        dbCommand.Parameters.AddWithValue("@Diagnose", Diagnose);
+                    }
+                    try
+                    {
+                        dbCommand.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Ошибка сохранения исследования");
+                        return;
+                    }
+                    reader1.Close();                  
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    reader.Close();
+                    return;
+                }
+            }
+            reader.Close();
+            MessageBox.Show("Все данные обработаны и записаны", "Уведомление");
+        }
 
         private List<string> GetRecursFiles(string start_path)
         {

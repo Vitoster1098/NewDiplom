@@ -185,7 +185,7 @@ namespace Diplom
             bar.Value = 0;             
             clearAvg();
 
-            for (int i = 0; i < data.Length - 1; i++)
+            for (int i = 0; i < data.Length - 1; ++i)
             {
                 Color newclr = newBrightness(data[i].getColor(), avgBrightness);
                 setAvgColor(newclr);

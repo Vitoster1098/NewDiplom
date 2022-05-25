@@ -29,20 +29,20 @@ namespace Diplom
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series7 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend6 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series8 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend7 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend8 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.connect = new System.Windows.Forms.Button();
             this.disconnect = new System.Windows.Forms.Button();
             this.connect_status = new System.Windows.Forms.PictureBox();
@@ -78,12 +78,13 @@ namespace Diplom
             this.label2 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.DeflRLabel = new System.Windows.Forms.Label();
-            this.DeflGLabel = new System.Windows.Forms.Label();
-            this.DeflBLabel = new System.Windows.Forms.Label();
-            this.MedRLabel = new System.Windows.Forms.Label();
-            this.MedGLabel = new System.Windows.Forms.Label();
             this.MedBLabel = new System.Windows.Forms.Label();
+            this.MedGLabel = new System.Windows.Forms.Label();
+            this.MedRLabel = new System.Windows.Forms.Label();
+            this.DeflBLabel = new System.Windows.Forms.Label();
+            this.DeflGLabel = new System.Windows.Forms.Label();
+            this.DeflRLabel = new System.Windows.Forms.Label();
+            this.заполнитьДанныеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.connect_status)).BeginInit();
             this.panel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -213,7 +214,8 @@ namespace Diplom
             // 
             this.сохранитьToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.сохранитьГистограммToolStripMenuItem,
-            this.загрузитьToolStripMenuItem});
+            this.загрузитьToolStripMenuItem,
+            this.заполнитьДанныеToolStripMenuItem});
             this.сохранитьToolStripMenuItem.Name = "сохранитьToolStripMenuItem";
             this.сохранитьToolStripMenuItem.Size = new System.Drawing.Size(95, 20);
             this.сохранитьToolStripMenuItem.Text = "Гистограммы";
@@ -221,14 +223,14 @@ namespace Diplom
             // сохранитьГистограммToolStripMenuItem
             // 
             this.сохранитьГистограммToolStripMenuItem.Name = "сохранитьГистограммToolStripMenuItem";
-            this.сохранитьГистограммToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.сохранитьГистограммToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.сохранитьГистограммToolStripMenuItem.Text = "Сохранить";
             this.сохранитьГистограммToolStripMenuItem.Click += new System.EventHandler(this.сохранитьГистограммToolStripMenuItem_Click);
             // 
             // загрузитьToolStripMenuItem
             // 
             this.загрузитьToolStripMenuItem.Name = "загрузитьToolStripMenuItem";
-            this.загрузитьToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+            this.загрузитьToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.загрузитьToolStripMenuItem.Text = "Загрузить";
             this.загрузитьToolStripMenuItem.Click += new System.EventHandler(this.загрузитьToolStripMenuItem_Click);
             // 
@@ -292,19 +294,19 @@ namespace Diplom
             // 
             // chart1
             // 
-            chartArea5.AxisX.Maximum = 255D;
-            chartArea5.AxisX.Minimum = 0D;
-            chartArea5.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea5);
-            legend5.Name = "Legend1";
-            this.chart1.Legends.Add(legend5);
+            chartArea1.AxisX.Maximum = 255D;
+            chartArea1.AxisX.Minimum = 0D;
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(675, 61);
             this.chart1.Name = "chart1";
-            series7.ChartArea = "ChartArea1";
-            series7.Color = System.Drawing.Color.Red;
-            series7.Legend = "Legend1";
-            series7.Name = "R";
-            this.chart1.Series.Add(series7);
+            series1.ChartArea = "ChartArea1";
+            series1.Color = System.Drawing.Color.Red;
+            series1.Legend = "Legend1";
+            series1.Name = "R";
+            this.chart1.Series.Add(series1);
             this.chart1.Size = new System.Drawing.Size(381, 195);
             this.chart1.TabIndex = 13;
             this.chart1.Text = "chart1";
@@ -320,70 +322,70 @@ namespace Diplom
             // 
             // chart2
             // 
-            chartArea6.AxisX.Maximum = 255D;
-            chartArea6.AxisX.Minimum = 0D;
-            chartArea6.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea6);
-            legend6.Name = "Legend1";
-            this.chart2.Legends.Add(legend6);
+            chartArea2.AxisX.Maximum = 255D;
+            chartArea2.AxisX.Minimum = 0D;
+            chartArea2.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chart2.Legends.Add(legend2);
             this.chart2.Location = new System.Drawing.Point(675, 262);
             this.chart2.Name = "chart2";
-            series8.ChartArea = "ChartArea1";
-            series8.Color = System.Drawing.Color.Lime;
-            series8.Legend = "Legend1";
-            series8.Name = "G";
-            this.chart2.Series.Add(series8);
+            series2.ChartArea = "ChartArea1";
+            series2.Color = System.Drawing.Color.Lime;
+            series2.Legend = "Legend1";
+            series2.Name = "G";
+            this.chart2.Series.Add(series2);
             this.chart2.Size = new System.Drawing.Size(381, 195);
             this.chart2.TabIndex = 15;
             this.chart2.Text = "chart2";
             // 
             // chart3
             // 
-            chartArea7.AxisX.Maximum = 255D;
-            chartArea7.AxisX.Minimum = 0D;
-            chartArea7.Name = "ChartArea1";
-            this.chart3.ChartAreas.Add(chartArea7);
-            legend7.Name = "Legend1";
-            this.chart3.Legends.Add(legend7);
+            chartArea3.AxisX.Maximum = 255D;
+            chartArea3.AxisX.Minimum = 0D;
+            chartArea3.Name = "ChartArea1";
+            this.chart3.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.chart3.Legends.Add(legend3);
             this.chart3.Location = new System.Drawing.Point(675, 463);
             this.chart3.Name = "chart3";
-            series9.ChartArea = "ChartArea1";
-            series9.Color = System.Drawing.Color.Blue;
-            series9.Legend = "Legend1";
-            series9.Name = "B";
-            this.chart3.Series.Add(series9);
+            series3.ChartArea = "ChartArea1";
+            series3.Color = System.Drawing.Color.Blue;
+            series3.Legend = "Legend1";
+            series3.Name = "B";
+            this.chart3.Series.Add(series3);
             this.chart3.Size = new System.Drawing.Size(381, 195);
             this.chart3.TabIndex = 16;
             this.chart3.Text = "chart3";
             // 
             // chart4
             // 
-            chartArea8.AxisX.Maximum = 255D;
-            chartArea8.AxisX.Minimum = 0D;
-            chartArea8.Name = "ChartArea1";
-            this.chart4.ChartAreas.Add(chartArea8);
-            legend8.Name = "Legend1";
-            this.chart4.Legends.Add(legend8);
+            chartArea4.AxisX.Maximum = 255D;
+            chartArea4.AxisX.Minimum = 0D;
+            chartArea4.Name = "ChartArea1";
+            this.chart4.ChartAreas.Add(chartArea4);
+            legend4.Name = "Legend1";
+            this.chart4.Legends.Add(legend4);
             this.chart4.Location = new System.Drawing.Point(259, 463);
             this.chart4.Name = "chart4";
-            series10.ChartArea = "ChartArea1";
-            series10.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series10.Color = System.Drawing.Color.Red;
-            series10.Legend = "Legend1";
-            series10.Name = "R";
-            series11.ChartArea = "ChartArea1";
-            series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series11.Color = System.Drawing.Color.Lime;
-            series11.Legend = "Legend1";
-            series11.Name = "G";
-            series12.ChartArea = "ChartArea1";
-            series12.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series12.Color = System.Drawing.Color.Blue;
-            series12.Legend = "Legend1";
-            series12.Name = "B";
-            this.chart4.Series.Add(series10);
-            this.chart4.Series.Add(series11);
-            this.chart4.Series.Add(series12);
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series4.Color = System.Drawing.Color.Red;
+            series4.Legend = "Legend1";
+            series4.Name = "R";
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series5.Color = System.Drawing.Color.Lime;
+            series5.Legend = "Legend1";
+            series5.Name = "G";
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series6.Color = System.Drawing.Color.Blue;
+            series6.Legend = "Legend1";
+            series6.Name = "B";
+            this.chart4.Series.Add(series4);
+            this.chart4.Series.Add(series5);
+            this.chart4.Series.Add(series6);
             this.chart4.Size = new System.Drawing.Size(410, 195);
             this.chart4.TabIndex = 17;
             this.chart4.Text = "chart4";
@@ -479,41 +481,14 @@ namespace Diplom
             this.panel3.Size = new System.Drawing.Size(410, 125);
             this.panel3.TabIndex = 24;
             // 
-            // DeflRLabel
+            // MedBLabel
             // 
-            this.DeflRLabel.AutoSize = true;
-            this.DeflRLabel.Location = new System.Drawing.Point(6, 103);
-            this.DeflRLabel.Name = "DeflRLabel";
-            this.DeflRLabel.Size = new System.Drawing.Size(75, 13);
-            this.DeflRLabel.TabIndex = 21;
-            this.DeflRLabel.Text = "Ср.кв.откл R:";
-            // 
-            // DeflGLabel
-            // 
-            this.DeflGLabel.AutoSize = true;
-            this.DeflGLabel.Location = new System.Drawing.Point(135, 103);
-            this.DeflGLabel.Name = "DeflGLabel";
-            this.DeflGLabel.Size = new System.Drawing.Size(75, 13);
-            this.DeflGLabel.TabIndex = 22;
-            this.DeflGLabel.Text = "Ср.кв.откл G:";
-            // 
-            // DeflBLabel
-            // 
-            this.DeflBLabel.AutoSize = true;
-            this.DeflBLabel.Location = new System.Drawing.Point(263, 103);
-            this.DeflBLabel.Name = "DeflBLabel";
-            this.DeflBLabel.Size = new System.Drawing.Size(74, 13);
-            this.DeflBLabel.TabIndex = 23;
-            this.DeflBLabel.Text = "Ср.кв.откл B:";
-            // 
-            // MedRLabel
-            // 
-            this.MedRLabel.AutoSize = true;
-            this.MedRLabel.Location = new System.Drawing.Point(6, 76);
-            this.MedRLabel.Name = "MedRLabel";
-            this.MedRLabel.Size = new System.Drawing.Size(66, 13);
-            this.MedRLabel.TabIndex = 24;
-            this.MedRLabel.Text = "Медиана R:";
+            this.MedBLabel.AutoSize = true;
+            this.MedBLabel.Location = new System.Drawing.Point(271, 76);
+            this.MedBLabel.Name = "MedBLabel";
+            this.MedBLabel.Size = new System.Drawing.Size(65, 13);
+            this.MedBLabel.TabIndex = 26;
+            this.MedBLabel.Text = "Медиана B:";
             // 
             // MedGLabel
             // 
@@ -524,14 +499,48 @@ namespace Diplom
             this.MedGLabel.TabIndex = 25;
             this.MedGLabel.Text = "Медиана G:";
             // 
-            // MedBLabel
+            // MedRLabel
             // 
-            this.MedBLabel.AutoSize = true;
-            this.MedBLabel.Location = new System.Drawing.Point(271, 76);
-            this.MedBLabel.Name = "MedBLabel";
-            this.MedBLabel.Size = new System.Drawing.Size(65, 13);
-            this.MedBLabel.TabIndex = 26;
-            this.MedBLabel.Text = "Медиана B:";
+            this.MedRLabel.AutoSize = true;
+            this.MedRLabel.Location = new System.Drawing.Point(6, 76);
+            this.MedRLabel.Name = "MedRLabel";
+            this.MedRLabel.Size = new System.Drawing.Size(66, 13);
+            this.MedRLabel.TabIndex = 24;
+            this.MedRLabel.Text = "Медиана R:";
+            // 
+            // DeflBLabel
+            // 
+            this.DeflBLabel.AutoSize = true;
+            this.DeflBLabel.Location = new System.Drawing.Point(263, 103);
+            this.DeflBLabel.Name = "DeflBLabel";
+            this.DeflBLabel.Size = new System.Drawing.Size(74, 13);
+            this.DeflBLabel.TabIndex = 23;
+            this.DeflBLabel.Text = "Ср.кв.откл B:";
+            // 
+            // DeflGLabel
+            // 
+            this.DeflGLabel.AutoSize = true;
+            this.DeflGLabel.Location = new System.Drawing.Point(135, 103);
+            this.DeflGLabel.Name = "DeflGLabel";
+            this.DeflGLabel.Size = new System.Drawing.Size(75, 13);
+            this.DeflGLabel.TabIndex = 22;
+            this.DeflGLabel.Text = "Ср.кв.откл G:";
+            // 
+            // DeflRLabel
+            // 
+            this.DeflRLabel.AutoSize = true;
+            this.DeflRLabel.Location = new System.Drawing.Point(6, 103);
+            this.DeflRLabel.Name = "DeflRLabel";
+            this.DeflRLabel.Size = new System.Drawing.Size(75, 13);
+            this.DeflRLabel.TabIndex = 21;
+            this.DeflRLabel.Text = "Ср.кв.откл R:";
+            // 
+            // заполнитьДанныеToolStripMenuItem
+            // 
+            this.заполнитьДанныеToolStripMenuItem.Name = "заполнитьДанныеToolStripMenuItem";
+            this.заполнитьДанныеToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.заполнитьДанныеToolStripMenuItem.Text = "Заполнить данные";
+            this.заполнитьДанныеToolStripMenuItem.Click += new System.EventHandler(this.заполнитьДанныеToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -621,6 +630,7 @@ namespace Diplom
         private System.Windows.Forms.Label MedRLabel;
         private System.Windows.Forms.Label MedBLabel;
         private System.Windows.Forms.Label MedGLabel;
+        private System.Windows.Forms.ToolStripMenuItem заполнитьДанныеToolStripMenuItem;
     }
 }
 
