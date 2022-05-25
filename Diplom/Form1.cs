@@ -75,6 +75,19 @@ namespace Diplom
             MedBLabel.Text = "Медиана B:";            
         }
 
+        int GetId(string path)
+        {
+            string query = "SELECT ID FROM Exsamples WHERE Path='" + path + "'";
+            dbCommand = new OleDbCommand(query, connection);
+            dbCommand.ExecuteNonQuery();
+
+            OleDbDataReader reader = dbCommand.ExecuteReader();
+            reader.Read();
+            int id = (int)reader["ID"];
+            reader.Close();
+            return id;            
+        }
+
         public void ScanFile(string path, string diagnose)
         {
             Bitmap image;
@@ -93,7 +106,7 @@ namespace Diplom
 
             string query = "INSERT INTO Exsamples (Path, Diagnose) VALUES ('" + Path.Combine(dn, Path.GetFileName(path)) + "', '" + diagnose + "')";
             dbCommand = new OleDbCommand(query, connection);
-            dbCommand.ExecuteNonQuery();
+            dbCommand.ExecuteNonQuery();            
 
             string varPos = "";
             string varRGB = "";
@@ -118,22 +131,25 @@ namespace Diplom
                 }
                 varPos = varPos.Substring(0, varPos.Length - 1);
                 varRGB = varRGB.Substring(0, varRGB.Length - 1);
-                addData(Path.Combine(dn, Path.GetFileName(path)), varPos, varRGB);
+                addData(varPos, varRGB, GetId(Path.Combine(dn, Path.GetFileName(path))));
             }
             catch (Exception ex)
             {
                 //Console.WriteLine("Встречен сложный запрос: " + ex.Message);
                 Debug.WriteLine("Встречен сложный запрос: " + ex.Message);
+                query = "DELETE FROM Exsamples WHERE Path='" + Path.Combine(dn, Path.GetFileName(path)) + "'";
+                dbCommand = new OleDbCommand(query, connection);
+                dbCommand.ExecuteNonQuery();
             }
         }
 
         //void addData(byte R, byte G, byte B, string path, string diagnose, int x, int y) //Заполнение информации о пикселях изображений
-        void addData(string path, string Pos, string RGB) //Заполнение информации о пикселях изображений
+        void addData(string Pos, string RGB, int id) //Заполнение информации о пикселях изображений
         {
             /*string query = "INSERT INTO Spot_info (ID_photo, X_point, Y_point, R, G, B) "
                 + "VALUES ('" + path + "', " + x + ", " + y + ", " + R + ", " + G + ", " + B + ")";*/
             string query = "INSERT INTO Spot_info (ID_photo, PosXY, RGB) "
-                + "VALUES ('" + path + "', '" + Pos + "', '" + RGB + "')";
+                + "VALUES ('" + id + "', '" + Pos + "', '" + RGB + "')";
             dbCommand = new OleDbCommand(query, connection);
             dbCommand.ExecuteNonQuery();
         }
@@ -255,7 +271,9 @@ namespace Diplom
             {
                 string newpath = listBox1.Items[listBox1.SelectedIndex].ToString().Substring(1);
 
-                string query = "SELECT * FROM Spot_info WHERE ID_photo='" + newpath + "'";
+                int id = GetId(newpath);
+
+                string query = "SELECT * FROM Spot_info WHERE ID_photo=" + id;
                 dbCommand = new OleDbCommand(query, connection);
                 OleDbDataReader reader = dbCommand.ExecuteReader();
 
@@ -399,10 +417,10 @@ namespace Diplom
         private void сохранитьГистограммToolStripMenuItem_Click(object sender, EventArgs e) //Сохранить данные гистограммы в БД
         {
             if(analyse.data.Length == 1) { return; }
-            string ID_photo = listBox1.SelectedItem.ToString();//.Substring(1);
-            //MessageBox.Show(ID_photo);
+            string path = listBox1.SelectedItem.ToString().Substring(1);
+            int id = GetId(path);
 
-            string query = "SELECT COUNT(*) AS num FROM Gist_info WHERE ID_photo='" + ID_photo + "'";
+            string query = "SELECT COUNT(*) AS num FROM Gist_info WHERE ID_photo=" + id;
             dbCommand = new OleDbCommand(query, connection);
             OleDbDataReader reader = dbCommand.ExecuteReader();
 
@@ -416,20 +434,23 @@ namespace Diplom
             imgData = imgData.Substring(0, imgData.Length - 1); //Удалить : в конце
             posData = posData.Substring(0, posData.Length - 1); //Удалить : в конце
 
+            dbCommand = new OleDbCommand(query, connection);
+            dbCommand.ExecuteNonQuery();
+
             string avRGB = Math.Round(analyse.getAverageGistogramm("R"), 3) + ":" + Math.Round(analyse.getAverageGistogramm("G"), 3) + ":" + Math.Round(analyse.getAverageGistogramm("B"), 3);
-            string MedRGB = analyse.getMed()[0] + ":" + analyse.getMed()[1] + ":" + analyse.getMed()[2];
-            string SgRGB = analyse.getSg()[0] + ":" + analyse.getSg()[1] + ":" + analyse.getSg()[2];
+            string MedRGB = Math.Round(analyse.getMed()[0], 3) + ":" + Math.Round(analyse.getMed()[1], 3) + ":" + Math.Round(analyse.getMed()[2], 3);
+            string SgRGB = Math.Round(analyse.getSg()[0], 3) + ":" + Math.Round(analyse.getSg()[1], 3) + ":" + Math.Round(analyse.getSg()[2], 3);
             
             reader.Read();
             if ((int)reader["num"] != 0) //Если есть запись
             {
-                query = "UPDATE Gist_info WHERE ID_photo='" + ID_photo + "' SET AllBright='" + analyse.getAvgBrightness() + "', " +
-                    "BrightRGB='"+ avRGB + "', Img='"+ imgData + "', Pos='" + posData +"', MedRGB='" + MedRGB + "', SgRGB='"+SgRGB+"'";
+                query = "UPDATE Gist_info SET AllBright='" + Math.Round(analyse.getAvgBrightness(), 3) + "', BrightRGB = '"+ avRGB + "', " +
+                     "Img='" + imgData + "', Pos='" + posData +"', MedRGB='" + MedRGB + "', SgRGB='"+SgRGB+ "' WHERE ID_photo=" + id + "";
             }
             else
             {
                 query = "INSERT INTO Gist_info (ID_photo, AllBright, BrightRGB, Img, Pos, MedRGB, SgRGB) "
-               + "VALUES ('" + ID_photo + "', '" + analyse.getAvgBrightness() + "', '" + avRGB + "', '" + imgData + "', '" + posData + "', " +
+               + "VALUES (" + id + ", '" + Math.Round(analyse.getAvgBrightness(), 3) + "', '" + avRGB + "', '" + imgData + "', '" + posData + "', " +
                "'" + MedRGB + "', '" + SgRGB + "')";
             }
             reader.Close();
@@ -448,7 +469,8 @@ namespace Diplom
 
         private void загрузитьToolStripMenuItem_Click(object sender, EventArgs e) //Загрузить данные гистограммы из БД
         {
-            string query = @"SELECT * FROM Gist_info WHERE ID_photo ='" + listBox1.SelectedItem.ToString() + "'";
+            int id = GetId(listBox1.SelectedItem.ToString().Substring(1));
+            string query = @"SELECT * FROM Gist_info WHERE ID_photo =" + id;
             dbCommand = new OleDbCommand(query, connection);
             OleDbDataReader reader = dbCommand.ExecuteReader();
 
@@ -464,6 +486,7 @@ namespace Diplom
 
             string[] tempImg = (reader["Img"]).ToString().Split(':');
             string[] tempPos = (reader["Pos"]).ToString().Split(':');
+
             int countPos = 0, countClr = 0;
 
             while (countPos != tempPos.Length)
