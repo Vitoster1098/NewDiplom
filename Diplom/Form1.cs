@@ -143,6 +143,7 @@ namespace Diplom
             }
         }
 
+        //void addData(byte R, byte G, byte B, string path, string diagnose, int x, int y) //Заполнение информации о пикселях изображений
         void addData(string Pos, string RGB, int id) //Заполнение информации о пикселях изображений
         {
             string query = "INSERT INTO Spot_info (ID_photo, PosXY, RGB) " +
